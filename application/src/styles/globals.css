@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&family=Inter:wght@400;500;600&family=Lora:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom-h {
+    height: calc(100vh - 68px);
+}
