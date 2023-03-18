@@ -241,9 +241,9 @@ function CVgenerator() {
           <hr/>
           <div className="flex my-4 justify-center items-center gap-4">
             <h3 className="py-4 font-bold">Share: </h3>
-            <Link href={'https://www.facebook.com/sharer/sharer.php?u=' + sharableLink}>
-              <button> <FaLinkedin size={32} /> </button>
-            </Link>
+            <a href={'https://www.facebook.com/sharer/sharer.php?u=' + sharableLink} >
+              <button type="button"> <FaLinkedin size={32} /> </button>
+            </a>
             <button> <FaFacebook size={32} /> </button>
           </div>
         </form>

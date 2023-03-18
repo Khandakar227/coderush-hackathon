@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id         Int         @id @default(autoincrement())
-  email      String      @unique
-  name       String
-  password   String
-  verified   Boolean
-  resetToken ResetToken?
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  name         String
+  password     String
+  verified     Boolean
   displayPhoto String
+  resetToken   ResetToken?
+  ucvData      userCVData?
 }
 
 model ResetToken {
@@ -29,3 +30,9 @@ model ResetToken {
   user      User    @relation(fields: [email], references: [email])
 }
 
+model userCVData {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  data  String
+  user  User   @relation(fields: [email], references: [email])
+}

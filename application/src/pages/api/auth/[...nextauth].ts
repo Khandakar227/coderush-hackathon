@@ -57,9 +57,9 @@ const nextAuthOptions: NextAuthOptions = {
 export default async function handler(req:NextApiRequest, res:NextApiResponse) {
   
   //Limit requests for DDOS protecton
-  await limiter
-    .check(res, 12, process.env.LRU_CACHE_TOKEN as string)
-    .catch((_) => res.status(429).json({ error: "Rate limit exceeded" }));
+  // await limiter
+  //   .check(res, 12, process.env.LRU_CACHE_TOKEN as string)
+  //   .catch((_) => res.status(429).json({ error: "Rate limit exceeded" }));
 
   return await NextAuth(req, res, nextAuthOptions);
 }
