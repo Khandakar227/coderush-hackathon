@@ -4,7 +4,7 @@ import React from 'react'
 function Login() {
   return (
     <div className='grid place-items-center custom-h bg-hero'>
-        <form className='p-4 border shadow rounded-md'>
+        <form className='p-4 border shadow rounded-md glass-morph'>
             <h2 className='text-3xl text-center font-bold py-4'> Login </h2>
             <label htmlFor="username" className='mt-6 text-slate-600'> Name:</label>
             <input name='username' type='text' placeholder='Enter your email address' className='p-4 rounded-md shadow-md border my-2 w-full'/>
