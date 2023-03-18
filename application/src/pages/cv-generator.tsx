@@ -6,6 +6,7 @@ import Template1 from "@/components/cv-generator/template/template1";
 import ShareButton from "@/components/cv-generator/ShareButton";
 import JsPDF from 'jspdf';
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
+import Template2 from "@/components/cv-generator/template/template2";
 import Link from "next/link";
 
 const themeData = [
@@ -15,13 +16,16 @@ const themeData = [
   {color: "text-white", bg: "bg-gray-800"},
   {color: "text-white", bg: "bg-indigo-700"},
   {color: "text-white", bg: "bg-teal-800"},
+  {color: "text-black", bg: "bg-[#F3FFC6]"}
 ];
 
+const templates = ["General", "Vintage"]
 function CVgenerator() {
   const [clientData, setClientData] = useState<ClientDataProps>();
   const [DisplayPhoto, setDisplayPhoto] = useState("");
   const [theme, setTheme] = useState(themeData[0]);
-  const [exportURL, setURL] = useState("");
+  const [template, setTemplate] = useState(templates[1]);
+  const [sharableLink, setLink] = useState("");
 
   useEffect(() => {
     const data = localStorage.getItem(CVDataStorageName);
@@ -33,7 +37,13 @@ function CVgenerator() {
       
       setClientData(parsedData);
       setDisplayPhoto(parsedImgData);
-    
+
+      const report = new JsPDF('landscape','pt', 'a4', true);
+      report.html(document.querySelector('#cv_template') as HTMLElement).then(() => {
+        const pdfDataUri = report.output('datauristring');
+        setLink(encodeURIComponent(pdfDataUri))
+      })
+
     } catch (error) {
       console.log("Error occured", error);
     }
@@ -80,16 +90,31 @@ function CVgenerator() {
   }
   
   const generatePDF = () => {
-    const report = new JsPDF('landscape','pt');
+    const report = new JsPDF('landscape','pt', 'a4', true);
+
     report.html(document.querySelector('#cv_template') as HTMLElement).then(() => {
-        report.save(Date.now().toString()+'cv.pdf');
+      report.save(Date.now().toString()+'cv.pdf');
     });
   }
   
+
+  const changTemplate = (e:React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e.target.value)
+    setTemplate(e.target.value);
+  }
+
   return (
     <div className="p-4 min-custom-h lg:flex justify-between items-center">
       <div className="p-1">
         <div className="glass-morph my-4">
+        <h2 className="text-xl p-4 font-bold"> Templates </h2>
+        <div className="p-4">
+          <div className="mb-3 xl:w-96">
+            <select defaultValue={template} data-te-select-init className="w-full h-[40px] rounded-md bg-white" onChange={changTemplate}>
+              {templates.map((t, i) => <option value={t}>{t}</option>)}
+            </select>
+          </div>
+        </div>
           <h2 className="text-xl p-4 font-bold"> Themes </h2>
           <div className="flex gap-4 p-2">
             {
@@ -216,14 +241,21 @@ function CVgenerator() {
           <hr/>
           <div className="flex my-4 justify-center items-center gap-4">
             <h3 className="py-4 font-bold">Share: </h3>
-            <button> <FaLinkedin size={32} /> </button>
+            <Link href={'https://www.facebook.com/sharer/sharer.php?u=' + sharableLink}>
+              <button> <FaLinkedin size={32} /> </button>
+            </Link>
             <button> <FaFacebook size={32} /> </button>
           </div>
         </form>
       </div>
 
       <div className="lg:fixed top-[68px] custom-h md:max-w-3xl w-full md:right-[10px] p-4">
-        <Template1 clientData={clientData as ClientDataProps} displayPhoto={DisplayPhoto} theme={theme}/>
+        {
+          template == templates[1] ?
+          <Template2 clientData={clientData as ClientDataProps} displayPhoto={DisplayPhoto} theme={theme}/>
+          :
+          <Template1 clientData={clientData as ClientDataProps} displayPhoto={DisplayPhoto} theme={theme}/> 
+        }
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown';
 import { ClientDataProps } from "@/utils/types";
 
 function Template1({
@@ -21,8 +22,8 @@ function Template1({
           className="h-20 rounded-lg border shadow"
         />
         <div>
-          <p className={`${fullPage ? "text-2xl":"text-lg"} font-bold`}> {clientData?.username[0]} </p>
-          <p> {clientData?.profession} </p>
+          <p className={`${fullPage ? "text-2xl":"text-lg"} font-bold py-1`}> {clientData?.username[0]} </p>
+          <p className="py-1"> {clientData?.profession} </p>
         </div>
       </div>
 
@@ -33,18 +34,18 @@ function Template1({
           <table cellSpacing="5">
             <tbody>
               <tr className="py-4 border-y-2">
-                <td className="field"> Name </td>
-                <td className="field-value"> {clientData?.username[0]} </td>
+                <td className="field py-1"> Name </td>
+                <td className="field-value py-1"> {clientData?.username[0]} </td>
               </tr>
 
               <tr className="py-4 border-y-2">
-                <td className="field"> Date of Birth </td>
-                <td className="field-value">{clientData?.date_of_birth[0]}</td>
+                <td className="field py-1"> Date of Birth </td>
+                <td className="field-value py-1">{clientData?.date_of_birth[0]}</td>
               </tr>
 
               <tr className="py-4 border-y-2">
-                <td className="field"> Adddress </td>
-                <td className="field-value">
+                <td className="field py-1"> Adddress </td>
+                <td className="field-value py-1">
                   {clientData?.city[0]} {clientData?.city.length ? "," : ""}
                   {clientData?.country[0]}
                 </td>
@@ -56,16 +57,16 @@ function Template1({
         <div className="m-1 p-4 border rounded-md bg-gray-100">
           <h4 className="text-sm text-blue-600 font-bold py-1"> Contact </h4>
           <hr />
-          <table cellSpacing="5" className="text-sm">
+          <table cellSpacing="5" className="text-sm py-1">
             <tbody>
               <tr className="py-4 border-y-2">
-                <td className="field"> Mobile no. </td>
-                <td className="field-value"> {clientData?.phone[0]} </td>
+                <td className="field py-1"> Mobile no. </td>
+                <td className="field-value py-1"> {clientData?.phone[0]} </td>
               </tr>
 
               <tr className="py-4 border-y-2">
-                <td className="field"> Email </td>
-                <td className="field-value"> {clientData?.email[0]} </td>
+                <td className="field py-1"> Email </td>
+                <td className="field-value py-1"> {clientData?.email[0]} </td>
               </tr>
             </tbody>
           </table>
@@ -74,7 +75,11 @@ function Template1({
         <div className="m-1 p-4 border rounded-md bg-gray-100">
           <h4 className="text-sm text-blue-600 font-bold py-1"> About </h4>
           <hr />
-          <p className="whitespace-pre-wrap">{clientData?.about[0]}</p>
+            <p className="whitespace-pre-wrap py-1">
+              <ReactMarkdown>
+                {clientData?.about[0]}
+              </ReactMarkdown>
+            </p>
         </div>
 
         <div className="m-1 p-4 border rounded-md bg-gray-100">
@@ -82,7 +87,11 @@ function Template1({
             Educational Qualifications
           </h4>
           <hr />
-          <p className="whitespace-pre-wrap">{clientData?.education[0]}</p>
+          <p className="whitespace-pre-wrap py-1">
+          <ReactMarkdown>
+            {clientData?.education[0]}
+          </ReactMarkdown>
+            </p>
         </div>
 
         <div className="m-1 p-4 border rounded-md bg-gray-100">
@@ -98,7 +107,11 @@ function Template1({
         <div className="m-1 p-4 border rounded-md bg-gray-100">
             <h4 className="text-sm text-blue-600 font-bold py-1"> Experience </h4>
             <hr/>
-            <p className="whitespace-pre-wrap"> {clientData?.experience ? clientData?.experience[0] : ""}</p>
+            <p className="whitespace-pre-wrap py-1">
+            <ReactMarkdown>
+              {clientData?.experience ? clientData?.experience[0] : ""}
+            </ReactMarkdown>
+            </p>
         </div>
       </div>
     </div>

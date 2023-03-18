@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import React from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { object, string } from "yup";
 
@@ -19,7 +20,7 @@ function ForgotPassword({
       ),
     });
 
-    function close(e: MouseEvent) {
+    function close(e: React.ChangeEvent<any>) {
         if ((e.target as HTMLElement).dataset.name == "forgot-password-wrapper")
       showForgotPassword();
   }
@@ -37,7 +38,7 @@ function ForgotPassword({
   return (
       <div
       data-name="forgot-password-wrapper"
-      className="fixed w-screen h-screen bg-black bg-opacity-25 flex justify-center items-center"
+      className="z-10 fixed w-screen h-screen bg-black bg-opacity-25 flex justify-center items-center"
       onClick={close}
     >
       <div className="p-4 rounded-md shadow bg-white max-w-lg">
