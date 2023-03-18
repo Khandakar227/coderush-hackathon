@@ -9,7 +9,7 @@ export default function Home() {
     <>
       <Head>
         <title>Next gen CV</title>
-        <meta name="description" content="An automated CV generator web app" />
+        <meta name="description" content="An automated CV generator web app+" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
