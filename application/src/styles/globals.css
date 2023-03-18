@@ -7,3 +7,9 @@
 .custom-h {
     height: calc(100vh - 68px);
 }
+.bg-hero {
+    background-image: url(/assets/wavy-bg.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
