@@ -1,34 +1,37 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import Input from "@/components/cv-generator/Input";
-import { CVDataStorageName } from "@/config";
+import { CVDataStorageName, CVPhotoStorageName } from "@/config";
+import { ClientDataProps } from "@/utils/types";
+import Template1 from "@/components/cv-generator/template/template1";
+import ShareButton from "@/components/cv-generator/ShareButton";
 
-interface ClientDataProps {
-  about: string[];
-  city: string[];
-  country: string[];
-  date_of_birth: string[];
-  display_picture: string[];
-  education: string[];
-  email: string[];
-  phone: string[];
-  profession: string[];
-  skills: string[];
-  username: string[];
-  [key: string]: any;
-}
+const themeData = [
+  {color: "text-white", bg: "bg-green-500"},
+  {color: "text-black", bg: "bg-yellow-200"},
+  {color: "text-white", bg: "bg-red-500"},
+  {color: "text-white", bg: "bg-gray-800"},
+  {color: "text-white", bg: "bg-indigo-700"},
+  {color: "text-white", bg: "bg-teal-800"},
+];
 
 function CVgenerator() {
   const [clientData, setClientData] = useState<ClientDataProps>();
+  const [DisplayPhoto, setDisplayPhoto] = useState("");
+  const [theme, setTheme] = useState(themeData[0]);
 
   useEffect(() => {
-    const data  = localStorage.getItem(CVDataStorageName);
+    const data = localStorage.getItem(CVDataStorageName);
+    const dpData = localStorage.getItem(CVPhotoStorageName);
+    // console.log(dpData);
     try {
-        const parsedData = JSON.parse(data as string);
-        setClientData(parsedData);
+      const parsedData = JSON.parse(data as string);
+      const parsedImgData = JSON.parse(dpData as string);
+      setClientData(parsedData);
+      setDisplayPhoto(parsedImgData);
     } catch (error) {
-        console.log("Error occured", error);
+      console.log("Error occured", error);
     }
-  },[])
+  }, []);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,16 +53,36 @@ function CVgenerator() {
 
     setClientData(data);
   };
+
+  const onUploadPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        const imgData = reader.result as string;
+        setDisplayPhoto(imgData);
+        localStorage.setItem(CVPhotoStorageName, JSON.stringify(imgData));
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const changeTheme = (i:number) => {
+    setTheme(themeData[i]);changeTheme
+  }
   return (
     <div className="p-4 min-custom-h lg:flex justify-between items-center">
       <div className="p-1">
         <div className="glass-morph my-4">
           <h2 className="text-xl p-4 font-bold"> Themes </h2>
           <div className="flex gap-4 p-2">
-            <button className="w-8 h-8 bg-red-400 rounded-2xl border shadow border-black"></button>
-            <button className="w-8 h-8 bg-blue-400 rounded-2xl border shadow border-black"></button>
-            <button className="w-8 h-8 bg-yellow-400 rounded-2xl border shadow border-black"></button>
-            <button className="w-8 h-8 bg-lime-400 rounded-2xl border shadow border-black"></button>
+            {
+              themeData.map((_theme, i) => (
+                <button key={_theme.bg} onClick={() =>changeTheme(i)} className={`w-8 h-8 ${_theme.bg} rounded-2xl border shadow border-black`}></button>
+              ))
+            }
           </div>
         </div>
 
@@ -70,49 +93,57 @@ function CVgenerator() {
             id="display_picture"
             type="file"
             name="display_picture"
+            accept="image/*"
+            onChange={onUploadPhoto}
           />
           <h3 className="text-xl p-4 font-bold"> Personal Information </h3>
           <Input
             label="Name"
             name="username"
             type="text"
-
+            defaultValue={clientData?.username[0]}
             placeholder="Enter your name"
           />
           <Input
             label="Profession"
             name="profession"
             type="text"
+            defaultValue={clientData?.profession[0]}
             placeholder="e.g. Fullstack web developer"
           />
           <Input
             label="City"
             name="city"
             type="text"
+            defaultValue={clientData?.city[0]}
             placeholder="e.g. Dhaka"
           />
           <Input
             label="Country"
             name="country"
             type="text"
+            defaultValue={clientData?.country[0]}
             placeholder="e.g. Bangladesh"
           />
           <Input
             label="Phone"
             name="phone"
             type="number"
+            defaultValue={clientData?.phone[0]}
             placeholder="e.g 01812345678"
           />
           <Input
             label="Email"
             name="email"
             type="email"
+            defaultValue={clientData?.email[0]}
             placeholder="e.g. johndoe@gmail.com"
           />
           <Input
             label="Date of Birth"
             name="date_of_birth"
             type="date"
+            defaultValue={clientData?.date_of_birth[0]}
             placeholder="e.g. 27 December 2002"
           />
           <hr className="my-4" />
@@ -122,6 +153,7 @@ function CVgenerator() {
             label="Write something about your self"
             name="about"
             type="text"
+            defaultValue={clientData?.about[0]}
             placeholder="e.g. I am a UI/UX designer. I like to create artistic UI..."
           />
 
@@ -132,130 +164,46 @@ function CVgenerator() {
             label="Tell us about your educational background"
             name="education"
             type="text"
+            defaultValue={clientData?.education[0]}
             placeholder="e.g Studied at Chittagong collegiate school 2017-19"
           />
 
           <h3 className="text-xl p-4 font-bold"> Skillset </h3>
+          { clientData?.skills.map((skill, i) => (
+              <Input
+                label="skills"
+                name="skills"
+                type="text"
+                key={`${i}. ${skill} input`}
+                defaultValue={skill}
+                placeholder="e.g. Web development"
+              />
+          )) }
+          
+          <h3 className="text-xl p-4 font-bold"> Experience </h3>
           <Input
-            label="skills"
-            name="skills"
+            element="textarea"
+            label="Experience"
+            name="experience"
             type="text"
-            placeholder="e.g. Web development"
+            defaultValue={clientData?.experience ? clientData?.experience[0] : ""}
+            placeholder="eg. I have been working as a software engineer for a year"
           />
-          <Input label="" name="skills" type="text" placeholder="e.g. Python" />
-          <Input
-            label=""
-            name="skills"
-            type="text"
-            placeholder="e.g. Web designer"
-          />
-          <Input
-            label=""
-            name="skills"
-            type="text"
-            placeholder="e.g. Product manager"
-          />
-          <Input
-            label=""
-            name="skills"
-            type="text"
-            placeholder="e.g. Content writer"
-          />
-          <button
-            className="my-4 py-4 px-8 shadow rounded-md bg-black text-white"
-            type="submit"
-          >
-            Submit
-          </button>
+          
+          <div className="flex gap-4 justify-evenly items-center">
+            <button
+              className="my-4 py-4 px-8 shadow rounded-md bg-black text-white"
+              type="submit"
+            >
+              Submit
+            </button>
+            <ShareButton/>
+          </div>
         </form>
       </div>
-      <div className="lg:fixed top-[68px] custom-h md:max-w-2xl w-full md:right-[10px] p-4">
-        <div className="bg-white text-sm w-full h-full border shadow overflow-auto">
-          <div className="bg-blue-600 text-white px-4 py-8 flex gap-4 justify-start items-center">
-            <img
-              src="/assets/dp_temp.png"
-              alt="khandakar"
-              className="w-20 h-20 rounded-lg border shadow"
-            />
-            <div>
-              <p className="text-lg font-bold"> {clientData?.username} </p>
-              <p> {clientData?.profession} </p>
-            </div>
-          </div>
-          <div className="m-4 p-4 border rounded-md bg-gray-100">
-            <h4 className="text-blue-600 font-bold py-1"> Personal </h4>
-            <hr />
-            <table cellSpacing="5">
-              <tbody>
-                <tr className="py-4 border-y-2">
-                  <td className="field"> Name </td>
-                  <td className="field-value"> {clientData?.username[0]} </td>
-                </tr>
 
-                <tr className="py-4 border-y-2">
-                  <td className="field"> Date of Birth </td>
-                  <td className="field-value">
-                    {" "}
-                    {clientData?.date_of_birth[0]}{" "}
-                  </td>
-                </tr>
-
-                <tr className="py-4 border-y-2">
-                  <td className="field"> Adddress </td>
-                  <td className="field-value">
-                    {" "}
-                    {clientData?.city[0]} {clientData?.city.length ? "," : ""}{" "}
-                    {clientData?.country[0]}{" "}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="m-4 p-4 border rounded-md bg-gray-100">
-            <h4 className="text-sm text-blue-600 font-bold py-1"> Contact </h4>
-            <hr />
-            <table cellSpacing="5" className="text-sm">
-              <tbody>
-                <tr className="py-4 border-y-2">
-                  <td className="field"> Mobile no. </td>
-                  <td className="field-value"> {clientData?.phone[0]} </td>
-                </tr>
-
-                <tr className="py-4 border-y-2">
-                  <td className="field"> Email </td>
-                  <td className="field-value"> {clientData?.email[0]} </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="m-4 p-4 border rounded-md bg-gray-100">
-            <h4 className="text-sm text-blue-600 font-bold py-1"> About </h4>
-            <hr />
-            <p className="whitespace-pre-wrap">{clientData?.about[0]}</p>
-          </div>
-
-          <div className="m-4 p-4 border rounded-md bg-gray-100">
-            <h4 className="text-sm text-blue-600 font-bold py-1">
-              {" "}
-              Educational Qualifications{" "}
-            </h4>
-            <hr />
-            <p className="whitespace-pre-wrap">{clientData?.education[0]}</p>
-          </div>
-
-          <div className="m-4 p-4 border rounded-md bg-gray-100">
-            <h4 className="text-sm text-blue-600 font-bold py-1"> Skillset </h4>
-            <hr />
-            {clientData?.skills.map((skill, i) => (
-              <p key={`${i}. ${skill}`} className="py-1">
-                {" "}
-                {i + 1}.{skill}
-              </p>
-            ))}
-          </div>
-        </div>
+      <div className="lg:fixed top-[68px] custom-h md:max-w-3xl w-full md:right-[10px] p-4">
+        <Template1 clientData={clientData as ClientDataProps} displayPhoto={DisplayPhoto} theme={theme}/>
       </div>
     </div>
   );
