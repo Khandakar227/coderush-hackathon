@@ -10,6 +10,7 @@ import { NotifyContext } from "@/context/notification";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useContext } from "react";
 import ForgotPassword from "@/components/ForgotPassword";
+import { useRouter } from "next/router";
 
 function Login() {
   const {
@@ -21,19 +22,28 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPass, showFP] = useState(false);
   const { setNotify } = useContext(NotifyContext);
+  const router = useRouter()
 
   const onSubmit = async (data: FieldValues) => {
     setIsLoading(true);
     try {
       const res = await signIn("credentials", { ...data, redirect: false });
       setIsLoading(false);
-      console.log(res)
+      console.log(res);
       if (!res?.ok)
         setNotify({
           heading: "ERROR",
           message: "Invalid email or password",
           type: "error",
         });
+      else {
+        setNotify({
+          heading: "Logged In",
+          message: "Logged in successfully",
+          type: "success",
+        });
+        router.push('/');
+      }
     } catch (error: any) {
       setIsLoading(false);
       setNotify({

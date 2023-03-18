@@ -4,6 +4,9 @@ import { CVDataStorageName, CVPhotoStorageName } from "@/config";
 import { ClientDataProps } from "@/utils/types";
 import Template1 from "@/components/cv-generator/template/template1";
 import ShareButton from "@/components/cv-generator/ShareButton";
+import JsPDF from 'jspdf';
+import { FaFacebook, FaLinkedin } from "react-icons/fa";
+import Link from "next/link";
 
 const themeData = [
   {color: "text-white", bg: "bg-green-500"},
@@ -18,6 +21,7 @@ function CVgenerator() {
   const [clientData, setClientData] = useState<ClientDataProps>();
   const [DisplayPhoto, setDisplayPhoto] = useState("");
   const [theme, setTheme] = useState(themeData[0]);
+  const [exportURL, setURL] = useState("");
 
   useEffect(() => {
     const data = localStorage.getItem(CVDataStorageName);
@@ -26,12 +30,14 @@ function CVgenerator() {
     try {
       const parsedData = JSON.parse(data as string);
       const parsedImgData = JSON.parse(dpData as string);
+      
       setClientData(parsedData);
       setDisplayPhoto(parsedImgData);
+    
     } catch (error) {
       console.log("Error occured", error);
     }
-  }, []);
+  }, [DisplayPhoto]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,6 +78,14 @@ function CVgenerator() {
   const changeTheme = (i:number) => {
     setTheme(themeData[i]);changeTheme
   }
+  
+  const generatePDF = () => {
+    const report = new JsPDF('landscape','pt');
+    report.html(document.querySelector('#cv_template') as HTMLElement).then(() => {
+        report.save(Date.now().toString()+'cv.pdf');
+    });
+  }
+  
   return (
     <div className="p-4 min-custom-h lg:flex justify-between items-center">
       <div className="p-1">
@@ -197,7 +211,13 @@ function CVgenerator() {
             >
               Submit
             </button>
-            <ShareButton/>
+              <button type="button" className="bg-[#eca22f] text-black py-4 px-8 rounded-md" onClick={generatePDF}> Export </button>
+          </div>
+          <hr/>
+          <div className="flex my-4 justify-center items-center gap-4">
+            <h3 className="py-4 font-bold">Share: </h3>
+            <button> <FaLinkedin size={32} /> </button>
+            <button> <FaFacebook size={32} /> </button>
           </div>
         </form>
       </div>

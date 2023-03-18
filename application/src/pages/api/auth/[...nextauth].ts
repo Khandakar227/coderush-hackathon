@@ -35,13 +35,15 @@ const nextAuthOptions: NextAuthOptions = {
         const hashedBuffer = scryptSync(password, salt, 64);
         const keyBuffer = Buffer.from(key, "hex");
         const match = timingSafeEqual(hashedBuffer, keyBuffer);
-        if (match)
+        if (match) {
+          console.log("User name: ", user.name);
           return {
             id: user.id.toString(),
             name: user.name,
             email: user.email,
             verified: user.verified,
           };
+        }
         return null;
       },
     }),

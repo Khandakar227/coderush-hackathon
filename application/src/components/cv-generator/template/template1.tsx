@@ -4,14 +4,16 @@ function Template1({
   clientData,
   displayPhoto,
   theme,
+  fullPage,
 }: {
   clientData: ClientDataProps;
   theme: {color:string, bg: string};
   displayPhoto: string;
+  fullPage?:boolean
 }) {
 
   return (
-    <div className="bg-white text-sm w-full h-full border shadow overflow-auto">
+    <div className={`bg-white ${ fullPage ? "": "text-sm"} w-full h-full border shadow overflow-auto`} id="cv_template">
       <div className={`${theme.color} ${theme.bg} px-4 py-8 flex gap-4 justify-start items-center`}>
         <img
           src={displayPhoto || "/assets/dp_temp.png"}
@@ -19,7 +21,7 @@ function Template1({
           className="h-20 rounded-lg border shadow"
         />
         <div>
-          <p className="text-lg font-bold"> {clientData?.username[0]} </p>
+          <p className={`${fullPage ? "text-2xl":"text-lg"} font-bold`}> {clientData?.username[0]} </p>
           <p> {clientData?.profession} </p>
         </div>
       </div>

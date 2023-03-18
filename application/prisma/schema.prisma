@@ -17,13 +17,15 @@ model User {
   password   String
   verified   Boolean
   resetToken ResetToken?
+  displayPhoto String
 }
 
 model ResetToken {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  used  Boolean
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  used      Boolean
   expiresIn String?
-  token String?
-  user  User    @relation(fields: [email], references: [email])
+  token     String?
+  user      User    @relation(fields: [email], references: [email])
 }
+

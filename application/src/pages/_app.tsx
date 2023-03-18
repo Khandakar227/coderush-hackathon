@@ -10,6 +10,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <nav className="flex justify-between gap-4 py-4 px-8 text-white bg-[#040926]">
           <Link href={"/"}>
             <h1 className="text-3xl font-bold">CVRush</h1>
+            {/* <img src="/assets/favicon.png" alt="Logo" className="w-12 h-12"/> */}
           </Link>
           <div>
             <Link href={"/auth/login"}>

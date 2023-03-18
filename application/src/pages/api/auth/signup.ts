@@ -64,6 +64,7 @@ export default async function handler(
         password: hashPassword(password),
         name: `${username}`,
         verified: false,
+        displayPhoto: ""
       },
     });
     res.status(200).json({ message: "Success" });
