@@ -7,17 +7,25 @@
 .custom-h {
     height: calc(100vh - 68px);
 }
+.min-custom-h {
+    min-height: calc(100vh - 68px);
+}
 .bg-hero {
     background-image: url(/assets/wavy-bg.jpg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 .glass-morph {
     background: rgba( 255, 255, 255, 0.25 );
-    box-shadow: 0 4px 26px 0 rgb(31 38 135 / 37%);
-    backdrop-filter: blur( 4px );
-    -webkit-backdrop-filter: blur( 4px );
+    box-shadow: 0 4px 26px 0 rgba(196, 196, 196, 0.37);
+    backdrop-filter: blur( 12px );
+    -webkit-backdrop-filter: blur( 12px );
     border-radius: 10px;
     border: 1px solid rgba( 255, 255, 255, 0.18 );
+}
+.field {
+    /* padding-bottom: 0.25rem; */
+    padding-right: 1rem;
 }
