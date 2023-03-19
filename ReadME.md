@@ -14,3 +14,14 @@ Doc file: [https://docs.google.com/document/d/1IWr747P3v_VJ1rwDdonFc9Cv2p3TpFH-n
 2. Open up your terminal. type `cd application`. 
 3. Then type `npm i` and `npm run dev`.
 4. Open up your browser and enter `localhost:3000`
+
+### Features
+1. functional Login , sign up
+2. Local storage data saving system
+3. SQLite db for global data storage
+4. functional reset password, forget password route
+5. password hashing system (with timing attack vector proof)
+6. A notification context provider for notifying users
+7. Export to PDF system
+8. 2 basic template
+9. Markdown syntax support
