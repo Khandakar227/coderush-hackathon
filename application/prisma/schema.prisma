@@ -18,7 +18,7 @@ model User {
   verified     Boolean
   displayPhoto String
   resetToken   ResetToken?
-  ucvData      userCVData?
+  userCVData      userCVData? 
 }
 
 model ResetToken {

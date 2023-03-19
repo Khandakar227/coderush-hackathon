@@ -20,9 +20,9 @@ export default async function handler(
   try {
     
     //Limit user sign up for DDOS protecton
-    await limiter
-    .check(res, 12, process.env.LRU_CACHE_TOKEN as string)
-    .catch((_) => res.status(429).json({ error: "Rate limit exceeded" }));
+    // await limiter
+    // .check(res, 12, process.env.LRU_CACHE_TOKEN as string)
+    // .catch((_) => res.status(429).json({ error: "Rate limit exceeded" }));
  
    const { email } = req.body;
    // Check if the email exist

@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 
 function Navbar() {
   const { data: sessionData, status } = useSession();
+  
   const router = useRouter();
   const logOut = () => {
     signOut().then(() => router.push("/auth/login"));
@@ -27,7 +28,7 @@ function Navbar() {
             </Link>
           </>
         ) : status == "authenticated" ? (
-          <button className="py-4 px-8 font-bold" onClick={logOut}>
+          <button className="p-1 px-8 font-bold" onClick={logOut}>
             Log out
           </button>
         ) : (

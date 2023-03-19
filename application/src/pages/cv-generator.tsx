@@ -1,31 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Input from "@/components/cv-generator/Input";
 import { CVDataStorageName, CVPhotoStorageName } from "@/config";
 import { ClientDataProps } from "@/utils/types";
 import Template1 from "@/components/cv-generator/template/template1";
-import ShareButton from "@/components/cv-generator/ShareButton";
-import JsPDF from 'jspdf';
+import { NotifyContext } from "@/context/notification";
+
+import JsPDF from "jspdf";
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
 import Template2 from "@/components/cv-generator/template/template2";
 import Link from "next/link";
+import axios from "axios";
+import { useSession } from "next-auth/react";
 
 const themeData = [
-  {color: "text-white", bg: "bg-green-500"},
-  {color: "text-black", bg: "bg-yellow-200"},
-  {color: "text-white", bg: "bg-red-500"},
-  {color: "text-white", bg: "bg-gray-800"},
-  {color: "text-white", bg: "bg-indigo-700"},
-  {color: "text-white", bg: "bg-teal-800"},
-  {color: "text-black", bg: "bg-[#F3FFC6]"}
+  { color: "text-white", bg: "bg-green-500" },
+  { color: "text-black", bg: "bg-yellow-200" },
+  { color: "text-white", bg: "bg-red-500" },
+  { color: "text-white", bg: "bg-gray-800" },
+  { color: "text-white", bg: "bg-indigo-700" },
+  { color: "text-white", bg: "bg-teal-800" },
+  { color: "text-black", bg: "bg-[#F3FFC6]" },
 ];
 
-const templates = ["General", "Vintage"]
+const templates = ["General", "Vintage"];
 function CVgenerator() {
   const [clientData, setClientData] = useState<ClientDataProps>();
   const [DisplayPhoto, setDisplayPhoto] = useState("");
   const [theme, setTheme] = useState(themeData[0]);
   const [template, setTemplate] = useState(templates[1]);
   const [sharableLink, setLink] = useState("");
+  const { setNotify } = useContext(NotifyContext);
 
   useEffect(() => {
     const data = localStorage.getItem(CVDataStorageName);
@@ -34,25 +38,26 @@ function CVgenerator() {
     try {
       const parsedData = JSON.parse(data as string);
       const parsedImgData = JSON.parse(dpData as string);
-      
+
       setClientData(parsedData);
       setDisplayPhoto(parsedImgData);
 
-      const report = new JsPDF('landscape','pt', 'a4', true);
-      report.html(document.querySelector('#cv_template') as HTMLElement).then(() => {
-        const pdfDataUri = report.output('datauristring');
-        setLink(encodeURIComponent(pdfDataUri))
-      })
-
+      const report = new JsPDF("landscape", "pt", "a4", true);
+      report
+        .html(document.querySelector("#cv_template") as HTMLElement)
+        .then(() => {
+          const pdfDataUri = report.output("datauristring");
+          setLink(encodeURIComponent(pdfDataUri));
+        });
     } catch (error) {
       console.log("Error occured", error);
     }
   }, [DisplayPhoto]);
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-
+    const { data: sessionData, status } = useSession();
     const data = {} as ClientDataProps;
 
     for (const [name, value] of formData.entries()) {
@@ -65,7 +70,23 @@ function CVgenerator() {
       }
     }
     localStorage.setItem(CVDataStorageName, JSON.stringify(data));
-    console.log(data);
+    //Add to database
+    //In the future We will use email collected from jsonweb token
+    try {
+      const res = await axios.post(
+        `/api/addcvtodb?email=${encodeURIComponent(sessionData?.user?.email as string)}`,
+        {
+          data: JSON.stringify(data),
+        }
+      );
+      console.log(res);
+    } catch (err: any) {
+      setNotify({
+        heading: "Error occured",
+        message: err.message,
+        type: "error",
+      });
+    }
 
     setClientData(data);
   };
@@ -85,43 +106,54 @@ function CVgenerator() {
     }
   };
 
-  const changeTheme = (i:number) => {
-    setTheme(themeData[i]);changeTheme
-  }
-  
+  const changeTheme = (i: number) => {
+    setTheme(themeData[i]);
+    changeTheme;
+  };
+
   const generatePDF = () => {
-    const report = new JsPDF('landscape','pt', 'a4', true);
+    const report = new JsPDF("landscape", "pt", "a4", true);
 
-    report.html(document.querySelector('#cv_template') as HTMLElement).then(() => {
-      report.save(Date.now().toString()+'cv.pdf');
-    });
-  }
-  
+    report
+      .html(document.querySelector("#cv_template") as HTMLElement)
+      .then(() => {
+        report.save(Date.now().toString() + "cv.pdf");
+      });
+  };
 
-  const changTemplate = (e:React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(e.target.value)
+  const changTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e.target.value);
     setTemplate(e.target.value);
-  }
+  };
 
   return (
     <div className="p-4 min-custom-h lg:flex justify-between items-center">
       <div className="p-1">
         <div className="glass-morph my-4">
-        <h2 className="text-xl p-4 font-bold"> Templates </h2>
-        <div className="p-4">
-          <div className="mb-3 xl:w-96">
-            <select defaultValue={template} data-te-select-init className="w-full h-[40px] rounded-md bg-white" onChange={changTemplate}>
-              {templates.map((t, i) => <option value={t}>{t}</option>)}
-            </select>
+          <h2 className="text-xl p-4 font-bold"> Templates </h2>
+          <div className="p-4">
+            <div className="mb-3 xl:w-96">
+              <select
+                defaultValue={template}
+                data-te-select-init
+                className="w-full h-[40px] rounded-md bg-white"
+                onChange={changTemplate}
+              >
+                {templates.map((t, i) => (
+                  <option value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
           <h2 className="text-xl p-4 font-bold"> Themes </h2>
           <div className="flex gap-4 p-2">
-            {
-              themeData.map((_theme, i) => (
-                <button key={_theme.bg} onClick={() =>changeTheme(i)} className={`w-8 h-8 ${_theme.bg} rounded-2xl border shadow border-black`}></button>
-              ))
-            }
+            {themeData.map((_theme, i) => (
+              <button
+                key={_theme.bg}
+                onClick={() => changeTheme(i)}
+                className={`w-8 h-8 ${_theme.bg} rounded-2xl border shadow border-black`}
+              ></button>
+            ))}
           </div>
         </div>
 
@@ -208,27 +240,29 @@ function CVgenerator() {
           />
 
           <h3 className="text-xl p-4 font-bold"> Skillset </h3>
-          { clientData?.skills.map((skill, i) => (
-              <Input
-                label="skills"
-                name="skills"
-                type="text"
-                key={`${i}. ${skill} input`}
-                defaultValue={skill}
-                placeholder="e.g. Web development"
-              />
-          )) }
-          
+          {clientData?.skills.map((skill, i) => (
+            <Input
+              label="skills"
+              name="skills"
+              type="text"
+              key={`${i}. ${skill} input`}
+              defaultValue={skill}
+              placeholder="e.g. Web development"
+            />
+          ))}
+
           <h3 className="text-xl p-4 font-bold"> Experience </h3>
           <Input
             element="textarea"
             label="Experience"
             name="experience"
             type="text"
-            defaultValue={clientData?.experience ? clientData?.experience[0] : ""}
+            defaultValue={
+              clientData?.experience ? clientData?.experience[0] : ""
+            }
             placeholder="eg. I have been working as a software engineer for a year"
           />
-          
+
           <div className="flex gap-4 justify-evenly items-center">
             <button
               className="my-4 py-4 px-8 shadow rounded-md bg-black text-white"
@@ -236,26 +270,50 @@ function CVgenerator() {
             >
               Submit
             </button>
-              <button type="button" className="bg-[#eca22f] text-black py-4 px-8 rounded-md" onClick={generatePDF}> Export </button>
+            <button
+              type="button"
+              className="bg-[#eca22f] text-black py-4 px-8 rounded-md"
+              onClick={generatePDF}
+            >
+              {" "}
+              Export{" "}
+            </button>
           </div>
-          <hr/>
+          <hr />
           <div className="flex my-4 justify-center items-center gap-4">
             <h3 className="py-4 font-bold">Share: </h3>
-            <a href={'https://www.facebook.com/sharer/sharer.php?u=' + sharableLink} >
-              <button type="button"> <FaLinkedin size={32} /> </button>
+            <a
+              href={
+                "https://www.facebook.com/sharer/sharer.php?u=" + sharableLink
+              }
+            >
+              <button type="button">
+                {" "}
+                <FaLinkedin size={32} />{" "}
+              </button>
             </a>
-            <button> <FaFacebook size={32} /> </button>
+            <button>
+              {" "}
+              <FaFacebook size={32} />{" "}
+            </button>
           </div>
         </form>
       </div>
 
       <div className="lg:fixed top-[68px] custom-h md:max-w-3xl w-full md:right-[10px] p-4">
-        {
-          template == templates[1] ?
-          <Template2 clientData={clientData as ClientDataProps} displayPhoto={DisplayPhoto} theme={theme}/>
-          :
-          <Template1 clientData={clientData as ClientDataProps} displayPhoto={DisplayPhoto} theme={theme}/> 
-        }
+        {template == templates[1] ? (
+          <Template2
+            clientData={clientData as ClientDataProps}
+            displayPhoto={DisplayPhoto}
+            theme={theme}
+          />
+        ) : (
+          <Template1
+            clientData={clientData as ClientDataProps}
+            displayPhoto={DisplayPhoto}
+            theme={theme}
+          />
+        )}
       </div>
     </div>
   );

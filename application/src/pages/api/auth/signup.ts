@@ -19,9 +19,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   //Limit requests for DDOS protecton
-  await limiter
-    .check(res, 12, process.env.LRU_CACHE_TOKEN as string)
-    .catch((_) => res.status(429).json({ error: "Rate limit exceeded" }));
+  // await limiter
+  //   .check(res, 12, process.env.LRU_CACHE_TOKEN as string)
+  //   .catch((_) => res.status(429).json({ error: "Rate limit exceeded" }));
 
   try {
     await userInfoSchema.validate(req.body);
@@ -64,7 +64,7 @@ export default async function handler(
         password: hashPassword(password),
         name: `${username}`,
         verified: false,
-        displayPhoto: ""
+        displayPhoto: "",
       },
     });
     res.status(200).json({ message: "Success" });
