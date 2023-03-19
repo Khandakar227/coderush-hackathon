@@ -23,12 +23,14 @@ const themeData = [
 ];
 
 const templates = ["General", "Vintage"];
+
 function CVgenerator() {
   const [clientData, setClientData] = useState<ClientDataProps>();
   const [DisplayPhoto, setDisplayPhoto] = useState("");
   const [theme, setTheme] = useState(themeData[0]);
   const [template, setTemplate] = useState(templates[1]);
-  const [sharableLink, setLink] = useState("");
+  // const [sharableLink, setLink] = useState("");
+  const { data: sessionData, status } = useSession();
   const { setNotify } = useContext(NotifyContext);
 
   useEffect(() => {
@@ -42,13 +44,22 @@ function CVgenerator() {
       setClientData(parsedData);
       setDisplayPhoto(parsedImgData);
 
-      const report = new JsPDF("landscape", "pt", "a4", true);
-      report
-        .html(document.querySelector("#cv_template") as HTMLElement)
-        .then(() => {
-          const pdfDataUri = report.output("datauristring");
-          setLink(encodeURIComponent(pdfDataUri));
-        });
+      // For  sharing with social media
+      // const report = new JsPDF("landscape", "pt", "a4", true);
+      // report
+      //   .html(document.querySelector("#cv_template") as HTMLElement)
+      //   .then(() => {
+      //     const pdfDataUri = report.output("datauristring");
+      //     setLink(encodeURIComponent(pdfDataUri));
+      //   });
+
+
+      //Get user CV data from the database
+      axios
+        .post("/api/getcvdata", { email: sessionData?.user?.email as string })
+        .then((res) => console.log(res.data?.data))
+        .catch(err => console.log(err.message))
+
     } catch (error) {
       console.log("Error occured", error);
     }
@@ -57,7 +68,6 @@ function CVgenerator() {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const { data: sessionData, status } = useSession();
     const data = {} as ClientDataProps;
 
     for (const [name, value] of formData.entries()) {
@@ -69,16 +79,15 @@ function CVgenerator() {
         data[name] = [value];
       }
     }
+
     localStorage.setItem(CVDataStorageName, JSON.stringify(data));
     //Add to database
-    //In the future We will use email collected from jsonweb token
     try {
-      const res = await axios.post(
-        `/api/addcvtodb?email=${encodeURIComponent(sessionData?.user?.email as string)}`,
-        {
-          data: JSON.stringify(data),
-        }
-      );
+      const res = await axios.post(`/api/addcvtodb`, {
+        email: sessionData?.user?.email as string,
+        data: JSON.stringify(data),
+      });
+
       console.log(res);
     } catch (err: any) {
       setNotify({
@@ -275,12 +284,12 @@ function CVgenerator() {
               className="bg-[#eca22f] text-black py-4 px-8 rounded-md"
               onClick={generatePDF}
             >
-              {" "}
-              Export{" "}
+              Export
             </button>
           </div>
           <hr />
-          <div className="flex my-4 justify-center items-center gap-4">
+
+          {/* <div className="flex my-4 justify-center items-center gap-4">
             <h3 className="py-4 font-bold">Share: </h3>
             <a
               href={
@@ -288,15 +297,13 @@ function CVgenerator() {
               }
             >
               <button type="button">
-                {" "}
-                <FaLinkedin size={32} />{" "}
+                <FaLinkedin size={32} />
               </button>
             </a>
             <button>
-              {" "}
-              <FaFacebook size={32} />{" "}
+              <FaFacebook size={32} />
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
 

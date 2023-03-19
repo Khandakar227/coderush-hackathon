@@ -10,8 +10,7 @@ export default async function handler(
   if (req.method != "POST") res.status(405).json({ error: "Invalid method" });
   try {
     // Instead of user email we will send jwt token later
-    const { email } = req.query;
-    const { data } = req.body;
+    const { email, data } = req.body;
 
     if (!email) {
       res.status(403).json({ error: "Bad request" });
