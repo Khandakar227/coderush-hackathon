@@ -98,9 +98,11 @@ function Template1({
           <h4 className="text-sm text-blue-600 font-bold py-1"> Skillset </h4>
           <hr />
           {clientData?.skills.map((skill, i) => (
+            skill ?
             <p key={`${i}. ${skill}`} className="py-1">
               {i + 1}. {skill}
             </p>
+            : ""
           ))}
         </div>
 

@@ -12,6 +12,7 @@ import Link from "next/link";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 
+//CV theme
 const themeData = [
   { color: "text-white", bg: "bg-green-500" },
   { color: "text-black", bg: "bg-yellow-200" },
@@ -21,11 +22,13 @@ const themeData = [
   { color: "text-white", bg: "bg-teal-800" },
   { color: "text-black", bg: "bg-[#F3FFC6]" },
 ];
-
+//template names
 const templates = ["General", "Vintage"];
 
 function CVgenerator() {
+  //cv informatin
   const [clientData, setClientData] = useState<ClientDataProps>();
+  //Display photo (imageURL data)
   const [DisplayPhoto, setDisplayPhoto] = useState("");
   const [theme, setTheme] = useState(themeData[0]);
   const [template, setTemplate] = useState(templates[1]);
@@ -34,30 +37,25 @@ function CVgenerator() {
   const { setNotify } = useContext(NotifyContext);
 
   useEffect(() => {
+    // Get previously saved data from the local storage
     const data = localStorage.getItem(CVDataStorageName);
+    // Get previously saved display photo from the local storage 
     const dpData = localStorage.getItem(CVPhotoStorageName);
-    // console.log(dpData);
     try {
+      
       const parsedData = JSON.parse(data as string);
       const parsedImgData = JSON.parse(dpData as string);
 
       setClientData(parsedData);
       setDisplayPhoto(parsedImgData);
 
-      // For  sharing with social media
-      // const report = new JsPDF("landscape", "pt", "a4", true);
-      // report
-      //   .html(document.querySelector("#cv_template") as HTMLElement)
-      //   .then(() => {
-      //     const pdfDataUri = report.output("datauristring");
-      //     setLink(encodeURIComponent(pdfDataUri));
-      //   });
-
-
       //Get user CV data from the database
+      // Giving preference to Database over local storage
       axios
         .post("/api/getcvdata", { email: sessionData?.user?.email as string })
-        .then((res) => console.log(res.data?.data))
+        .then((res) => {
+          setClientData(JSON.parse(res.data?.data?.data))
+        })
         .catch(err => console.log(err.message))
 
     } catch (error) {
@@ -65,6 +63,7 @@ function CVgenerator() {
     }
   }, [DisplayPhoto]);
 
+  //Hand form submission
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
@@ -79,10 +78,11 @@ function CVgenerator() {
         data[name] = [value];
       }
     }
-
+    //Save cv data in local storage
     localStorage.setItem(CVDataStorageName, JSON.stringify(data));
     //Add to database
     try {
+      //Save cv data in global database
       const res = await axios.post(`/api/addcvtodb`, {
         email: sessionData?.user?.email as string,
         data: JSON.stringify(data),
@@ -119,10 +119,11 @@ function CVgenerator() {
     setTheme(themeData[i]);
     changeTheme;
   };
-
+  
+  // Convert CV to PDF
   const generatePDF = () => {
     const report = new JsPDF("landscape", "pt", "a4", true);
-
+  // Get the html element using selector
     report
       .html(document.querySelector("#cv_template") as HTMLElement)
       .then(() => {
@@ -249,13 +250,13 @@ function CVgenerator() {
           />
 
           <h3 className="text-xl p-4 font-bold"> Skillset </h3>
-          {clientData?.skills.map((skill, i) => (
+          {[...Array(5).keys()].map((_, i) => (
             <Input
               label="skills"
               name="skills"
               type="text"
-              key={`${i}. ${skill} input`}
-              defaultValue={skill}
+              key={`${i}. ${clientData?.skills[i]} input`}
+              defaultValue={clientData?.skills[i]}
               placeholder="e.g. Web development"
             />
           ))}
@@ -288,22 +289,6 @@ function CVgenerator() {
             </button>
           </div>
           <hr />
-
-          {/* <div className="flex my-4 justify-center items-center gap-4">
-            <h3 className="py-4 font-bold">Share: </h3>
-            <a
-              href={
-                "https://www.facebook.com/sharer/sharer.php?u=" + sharableLink
-              }
-            >
-              <button type="button">
-                <FaLinkedin size={32} />
-              </button>
-            </a>
-            <button>
-              <FaFacebook size={32} />
-            </button>
-          </div> */}
         </form>
       </div>
 

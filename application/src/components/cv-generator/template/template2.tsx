@@ -1,4 +1,5 @@
 import { ClientDataProps } from "@/utils/types";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 function Template2({
@@ -12,6 +13,12 @@ function Template2({
   displayPhoto: string;
   fullPage?: boolean;
 }) {
+  const [skills, setSkills] = useState([""]);
+  useEffect(() => {
+    if (!clientData?.skills.length) return;
+    setSkills(clientData.skills.filter(skill => skill))
+    console.log(skills);
+  }, [clientData?.skills]);
   return (
     <div
       className={`bg-white ${
@@ -38,27 +45,31 @@ function Template2({
           <div className="pt-4">
             <h4 className="text-2xl font-bold py-1"> Experience </h4>
             <p className="whitespace-pre-wrap py-4">
-            <ReactMarkdown>
-              {clientData?.experience ? clientData?.experience[0] : ""}
-            </ReactMarkdown>
+              <ReactMarkdown>
+                {clientData?.experience ? clientData?.experience[0] : ""}
+              </ReactMarkdown>
             </p>
           </div>
           <div className="pt-4">
             <h4 className="text-2xl font-bold py-1"> About </h4>
             <p className="whitespace-pre-wrap py-4">
-            <ReactMarkdown>
-              {clientData?.about ? clientData?.about[0] : ""}
-            </ReactMarkdown>
+              <ReactMarkdown>
+                {clientData?.about ? clientData?.about[0] : ""}
+              </ReactMarkdown>
             </p>
           </div>
 
           <div className="pt-4">
             <h4 className="text-2xl font-bold py-1"> Skillset </h4>
-            {clientData?.skills.map((skill, i) => (
-              <p key={`${i}. ${skill}`} className="py-1">
-                {i + 1}. {skill}
-              </p>
-            ))}
+            {skills.map((skill, i) =>
+              skill ? (
+                <p key={`${i}. ${skill}`} className="py-1">
+                  {i + 1}. {skill}
+                </p>
+              ) : (
+                ""
+              )
+            )}
           </div>
         </div>
         <div className="p-4">
@@ -105,10 +116,8 @@ function Template2({
 
           <h4 className="text-2xl font-bold pt-4 py-2"> Education </h4>
           <p className="whitespace-pre-wrap py-1">
-            <ReactMarkdown>
-                {clientData?.education[0]}
-            </ReactMarkdown>
-            </p>
+            <ReactMarkdown>{clientData?.education[0]}</ReactMarkdown>
+          </p>
         </div>
       </div>
     </div>
