@@ -10,4 +10,4 @@ Gonna finish this project
 6. undo redo feature (pkg: use-undo-redo).
 
 Undo Feature:
-So far I have implemented a stack fr undo and redo. now function also works (almost). Now onDragEnd selector gives me child element not the element I am dragging. This should be fixed.
+    Done. Now keyboard event needs to be added

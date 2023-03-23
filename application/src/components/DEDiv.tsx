@@ -13,21 +13,15 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   const id = useId();
   const { undoStack, addUndo } = useUndoRedo();
 
-  const handleDragEnd = (e: DraggableEvent) => {
-    const element = divRef.current;
-    addUndo({ fx: drag, args: [element.id, element.style.transform] });
-  };
-
   const handleDragStart = (e: DraggableEvent) => {
     const element = divRef.current;
-    console.log(element.style.transform)
-    if (!undoStack.length) addUndo({fx: drag, args: [element.style.transform]})
+    addUndo({fx: drag, args: [element.id, element.style.transform]})
   };
 
   return (
     <>
       {divRef.current && (
-        <Draggable onStop={handleDragEnd} onStart={handleDragStart}>
+        <Draggable onStart={handleDragStart}>
           <div
             id={id}
             ref={divRef}

@@ -1,5 +1,3 @@
-import {UndoRedoELement} from '@/context/undoRedo';
-
 export function arrayEquals(a: any[], b: any[]) {
   return (
     Array.isArray(a) &&
@@ -12,7 +10,5 @@ export function arrayEquals(a: any[], b: any[]) {
 export function drag(elementId:string, translate:string) {
     let el = document.getElementById(elementId);
     if (!el) return;
-
     el.style.transform = translate;
-    console.log(el);
 }
