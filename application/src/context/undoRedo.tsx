@@ -43,18 +43,6 @@ export default function UndoRedoProvider({
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
-  //Set canUndo if undoStack is undoable
-  useEffect(() => {
-    if (undoStack.length) setCanUndo(true);
-    else setCanUndo(false);
-  }, [undoStack.length]);
-
-  //Set canRedo if RedoStack is redoable
-  useEffect(() => {
-    if (redoStack.length) setCanRedo(true);
-    else setCanRedo(false);
-  }, [redoStack.length]);
-
   const addUndo = (element: UndoRedoELement) => {
     setUndoStack((stk) => {
       if (
@@ -67,6 +55,12 @@ export default function UndoRedoProvider({
       stk.push(element);
       return stk;
     });
+        
+    // if (redoStack.length) setCanRedo(true);
+    // else setCanRedo(false);
+    // if (undoStack.length) setCanUndo(true);
+    // else setCanUndo(false);
+
     console.log("addUndo: ", undoStack);
   };
 
@@ -76,12 +70,19 @@ export default function UndoRedoProvider({
         stk.length &&
         stk[stk.length - 1].fx.toString() === element.fx.toString() &&
         arrayEquals(stk[stk.length - 1].args, element.args)
-      )
+        )
         return stk;
 
       stk.push(element);
       return stk;
     });
+    
+    // if (redoStack.length) setCanRedo(true);
+    // else setCanRedo(false);
+    // if (undoStack.length) setCanUndo(true);
+    // else setCanUndo(false);
+    
+    console.log("addRedo: ", redoStack);
   };
 
   const undo = () => {
@@ -111,6 +112,7 @@ export default function UndoRedoProvider({
 
     if (element == undefined) return;
     element.fx(...element.args);
+
     addUndo(element);
   };
 

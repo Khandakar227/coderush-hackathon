@@ -17,11 +17,15 @@ const DragEditDiv: React.FC<DEDivProps> = ({
     const element = divRef.current;
     addUndo({fx: drag, args: [element.id, element.style.transform]})
   };
-
+  
+  const handleDragEnd = (e: DraggableEvent) => {
+    const element = divRef.current;
+    addUndo({fx: drag, args: [element.id, element.style.transform]})
+  }
   return (
     <>
       {divRef.current && (
-        <Draggable onStart={handleDragStart}>
+        <Draggable onStart={handleDragStart} onStop={handleDragEnd}>
           <div
             id={id}
             ref={divRef}
