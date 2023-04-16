@@ -3,10 +3,11 @@ import { AiOutlineUndo, AiOutlineRedo } from "react-icons/ai"
 import UndoRedoProvider, { useUndoRedo } from "@/context/undoRedo";
 import Template1 from "@/components/cv-generator/v2/temp1";
 import React, { useState } from "react";
+import ColorPicker from "@/components/ColorPicker";
 
 const V2 = () => {
     const [theme, setTheme] = useState("#4338ca");
-    const { canUndo, canRedo, undo, redo } = useUndoRedo();
+    const { undo, redo } = useUndoRedo();
 
     // Convert CV to PDF
     const generatePDF = () => {
@@ -37,9 +38,6 @@ const V2 = () => {
         });
     };
 
-    const changeTheme = (e: React.ChangeEvent) => {
-        setTheme((e.target as HTMLInputElement).value)
-    }
 
     return (
         <>
@@ -47,7 +45,7 @@ const V2 = () => {
                 <div className="flex justify-start gap-4 items-center">
                     <button className="p-1" title="Undo" onClick={undo}><AiOutlineUndo className="scale-125" /></button>
                     <button className="p-1" title="Redo" onClick={redo}><AiOutlineRedo className="scale-125" /></button>
-                    <input type="color" title="theme color" defaultValue={theme} value={theme} onChange={changeTheme} />
+                    <ColorPicker theme={theme} setTheme={setTheme} />
                 </div>
                 <button className="px-2 py-1 rounded-md text-white bg-slate-900 text-sm" onClick={generatePDF}> Export </button>
             </div>

@@ -1,28 +1,20 @@
 import { arrayEquals } from "@/utils";
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 
-export interface UndoRedoELement {
+type UndoRedoFunction = {
   fx: Function;
   args: any[];
-}
+};
 
+export interface UndoRedoElement {
+  from: UndoRedoFunction;
+  to: UndoRedoFunction;
+}
 export interface UndoRedoProps {
-  canUndo: boolean;
-  canRedo: boolean;
-  undoStack: UndoRedoELement[];
-  redoStack: UndoRedoELement[];
-  setCanUndo: Dispatch<SetStateAction<boolean>>;
-  setCanRedo: Dispatch<SetStateAction<boolean>>;
-  addUndo: (element: UndoRedoELement) => void;
-  addRedo: (element: UndoRedoELement) => void;
+  undoStack: UndoRedoElement[];
+  redoStack: UndoRedoElement[];
+  addUndo: (element: UndoRedoElement) => void;
+  addRedo: (element: UndoRedoElement) => void;
   undo: () => void;
   redo: () => void;
 }
@@ -38,100 +30,85 @@ export default function UndoRedoProvider({
 }: {
   children: ReactNode | ReactNode[];
 }) {
-  const [undoStack, setUndoStack] = useState([] as UndoRedoELement[]);
-  const [redoStack, setRedoStack] = useState([] as UndoRedoELement[]);
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
+  const [undoStack, setUndoStack] = useState([] as UndoRedoElement[]);
+  const [redoStack, setRedoStack] = useState([] as UndoRedoElement[]);
 
-  const addUndo = (element: UndoRedoELement) => {
-    setUndoStack((stk) => {
-      if (
-        stk.length &&
-        stk[stk.length - 1].fx.toString() === element.fx.toString() &&
-        arrayEquals(stk[stk.length - 1].args, element.args)
-        )
+  const addUndo = (element: UndoRedoElement) => {
+    console.log("addUndo", element);
+    if (element.from?.fx == element.to?.fx && arrayEquals(element.from?.args, element.to?.args))
+    return;
+
+    setUndoStack(stk => {
+        if( !isDuplicate(element, stk) ) stk.push(element);
         return stk;
-
-      stk.push(element);
-      return stk;
-    });
-        
-    // if (redoStack.length) setCanRedo(true);
-    // else setCanRedo(false);
-    // if (undoStack.length) setCanUndo(true);
-    // else setCanUndo(false);
-
-    console.log("addUndo: ", undoStack);
+    })
+    setRedoStack([]);
+    console.log(undoStack);
   };
 
-  const addRedo = (element: UndoRedoELement) => {
-    setRedoStack((stk) => {
-      if (
-        stk.length &&
-        stk[stk.length - 1].fx.toString() === element.fx.toString() &&
-        arrayEquals(stk[stk.length - 1].args, element.args)
-        )
+  const addRedo = (element: UndoRedoElement) => {
+    setRedoStack(stk => {
+        if( !isDuplicate(element, stk) ) stk.push(element);
         return stk;
-
-      stk.push(element);
-      return stk;
-    });
-    
-    // if (redoStack.length) setCanRedo(true);
-    // else setCanRedo(false);
-    // if (undoStack.length) setCanUndo(true);
-    // else setCanUndo(false);
-    
-    console.log("addRedo: ", redoStack);
+    })
+    console.log(element);
   };
 
   const undo = () => {
-    // Defining a variable to hold the top most element
-    let element: UndoRedoELement | undefined;
+    let element: UndoRedoElement | undefined;
+
     setUndoStack((stk) => {
-      // Remove the top element from the stack and return it
-      element = stk.pop();
-      // Return the modified stack
-      return stk;
-    });
+        // Remove the top element from the stack and return it
+        element = stk.pop();
+        // Return the modified stack
+        return stk;
+      });
     // If there is no element then simply return
     if (element == undefined) return;
-    // Run the saved function with the given args
-    element.fx(...element.args);
-    
+
+    element.from?.fx(...element.from.args);
     addRedo(element);
+
   };
 
   const redo = () => {
-    let element: UndoRedoELement | undefined;
+    let element: UndoRedoElement | undefined;
 
     setRedoStack((stk) => {
-      element = stk.pop();
-      return stk;
-    });
-
+        // Remove the top element from the stack and return it
+        element = stk.pop();
+        // Return the modified stack
+        return stk;
+      });
+    // If there is no element then simply return
     if (element == undefined) return;
-    element.fx(...element.args);
 
+    element.to?.fx(...element.to.args);
     addUndo(element);
   };
 
   return (
     <undoRedoContext.Provider
       value={{
-        canUndo,
-        canRedo,
         undoStack,
         redoStack,
-        setCanUndo,
-        setCanRedo,
-        addUndo,
-        addRedo,
         undo,
         redo,
+        addUndo,
+        addRedo,
       }}
     >
       {children}
     </undoRedoContext.Provider>
   );
+}
+
+function isDuplicate(element:UndoRedoElement, stack: UndoRedoElement[]) {
+    if (!stack.length) return false;
+    if (stack[stack.length - 1]?.from.fx.name != element?.from.fx.name) return false;
+    if (stack[stack.length - 1]?.to?.fx.name != element?.to?.fx.name) return false;
+    if (!arrayEquals(stack[stack.length - 1]?.from.args, element?.from.args)) return false;
+    if (!arrayEquals(stack[stack.length - 1]?.to.args, element?.to.args)) return false;
+
+    return true;
 }

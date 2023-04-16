@@ -1,6 +1,6 @@
-import React, { HTMLAttributes, useRef, useId } from "react";
+import React, { HTMLAttributes, useRef, useId, useState } from "react";
 import Draggable, { DraggableEvent } from "react-draggable";
-import { useUndoRedo } from "@/context/undoRedo";
+import { UndoRedoElement, useUndoRedo } from "@/context/undoRedo";
 import { drag } from "@/utils";
 
 interface DEDivProps extends HTMLAttributes<HTMLDivElement> {}
@@ -11,17 +11,34 @@ const DragEditDiv: React.FC<DEDivProps> = ({
 }: DEDivProps) => {
   const divRef = useRef({} as HTMLDivElement);
   const id = useId();
-  const { undoStack, addUndo } = useUndoRedo();
+  const { addUndo } = useUndoRedo();
+  const [undoRedoElement, setElement] = useState({} as UndoRedoElement);
 
   const handleDragStart = (e: DraggableEvent) => {
     const element = divRef.current;
-    addUndo({fx: drag, args: [element.id, element.style.transform]})
+
+    setElement({
+      ...undoRedoElement,
+      from: {
+        fx: drag,
+        args: [element.id, element.style.transform],
+      },
+    });
   };
-  
+
   const handleDragEnd = (e: DraggableEvent) => {
     const element = divRef.current;
-    addUndo({fx: drag, args: [element.id, element.style.transform]})
-  }
+
+    setElement({
+      ...undoRedoElement,
+      to: {fx: drag, args: [element.id, element.style.transform]}
+    });
+    
+    addUndo({
+      ...undoRedoElement,
+      to: {fx: drag, args: [element.id, element.style.transform]}
+    })
+  };
   return (
     <>
       {divRef.current && (
