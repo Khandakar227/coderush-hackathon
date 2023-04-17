@@ -13,6 +13,7 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   const id = useId();
   const { addUndo } = useUndoRedo();
   const [undoRedoElement, setElement] = useState({} as UndoRedoElement);
+  const [disabled, setDisabled] = useState(false);
 
   const handleDragStart = (e: DraggableEvent) => {
     const element = divRef.current;
@@ -39,15 +40,23 @@ const DragEditDiv: React.FC<DEDivProps> = ({
       to: {fx: drag, args: [element.id, element.style.transform]}
     })
   };
+  const onFocus = () => {
+    setDisabled(true)
+  }
+  const onBlur = () => {
+    setDisabled(false)
+  }
   return (
     <>
       {divRef.current && (
-        <Draggable onStart={handleDragStart} onStop={handleDragEnd}>
+        <Draggable disabled={disabled} onStart={handleDragStart} onStop={handleDragEnd}>
           <div
             id={id}
             ref={divRef}
             contentEditable
             suppressContentEditableWarning
+            onFocus={onFocus}
+            onBlur={onBlur}
             {...props}
           >
             {children}

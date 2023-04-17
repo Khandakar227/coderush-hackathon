@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { ImgHTMLAttributes, useEffect, useRef, useState } from "react";
 import ContextMenu from "../ContextMenu";
 import { UndoRedoElement, useUndoRedo } from "@/context/undoRedo";
 
-function CVImage() {
+function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
   const photoUploadRef = useRef({} as HTMLInputElement);
   const DisplayPhotRef = useRef({} as HTMLImageElement);
 
@@ -41,25 +41,31 @@ function CVImage() {
    */
   function handleSliderUnclick() {
     setElement({
-      from: undoRedoElement.from,
+      ...undoRedoElement,
       to: {
         fx: setBR,
         args: [DisplayPhotRef.current.style.borderRadius.split("%")[0]],
       }
     })
     // Send the undoRedo Element to stack
-    addUndo(undoRedoElement);
+    addUndo({
+      ...undoRedoElement,
+      to: {
+        fx: setBR,
+        args: [DisplayPhotRef.current.style.borderRadius.split("%")[0]],
+      }
+    });
   }
   /**
    * Undo redo feature
    */
   function handSliderClick() {
     setElement({
+      ...undoRedoElement,
       from: {
         fx: setBR,
         args: [DisplayPhotRef.current.style.borderRadius.split("%")[0]],
       },
-      to: undoRedoElement.to,
     })
   }
   
@@ -117,7 +123,8 @@ function CVImage() {
         id="displayPhoto"
         ref={DisplayPhotRef}
         style={{ borderRadius: `${borderRadius}%`, aspectRatio: aspectRatio }}
-        className="w-32 shadow"
+        className={"w-32 shadow" + props?.className}
+        {...props}
         src={displayPhoto || "/assets/dp_temp.png"}
         onClick={onImageClick}
       />

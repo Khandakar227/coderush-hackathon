@@ -1,6 +1,4 @@
-import React, { useRef, useState } from "react";
-import JsPDF, {HTMLFontFace} from "jspdf";
-import { AiOutlineUndo, AiOutlineRedo } from "react-icons/ai"
+import React from "react";
 import DragEditDiv from "@/components/DEDiv";
 import EditDiv from "@/components/EditDiv";
 import CVImage from "../CVImage";
