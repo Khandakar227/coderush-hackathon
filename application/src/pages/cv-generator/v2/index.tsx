@@ -52,7 +52,7 @@ const V2 = () => {
             </div>
             <div className="min-custom-h w-full grid justify-center items-stretch p-4">
                 {/* <Template1 themeColor={theme}/> */}
-                <Template2 themeColor={theme}/>
+                <Template1 themeColor={theme}/>
             </div>
         </>
     );

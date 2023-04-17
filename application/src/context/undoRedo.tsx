@@ -104,10 +104,10 @@ export default function UndoRedoProvider({
 
 function isDuplicate(element:UndoRedoElement, stack: UndoRedoElement[]) {
     if (!stack.length) return false;
-    if (stack[stack.length - 1]?.from.fx.name != element?.from.fx.name) return false;
+    if (stack[stack.length - 1]?.from?.fx.name != element?.from?.fx.name) return false;
     if (stack[stack.length - 1]?.to?.fx.name != element?.to?.fx.name) return false;
-    if (!arrayEquals(stack[stack.length - 1]?.from.args, element?.from.args)) return false;
-    if (!arrayEquals(stack[stack.length - 1]?.to.args, element?.to.args)) return false;
+    if (!arrayEquals(stack[stack.length - 1]?.from?.args, element?.from?.args)) return false;
+    if (!arrayEquals(stack[stack.length - 1]?.to?.args, element?.to?.args)) return false;
 
     return true;
 }

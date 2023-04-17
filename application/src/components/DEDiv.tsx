@@ -1,9 +1,13 @@
-import React, { HTMLAttributes, useRef, useId, useState } from "react";
+import React, { HTMLAttributes, useRef, useId, useState, useEffect } from "react";
 import Draggable, { DraggableEvent } from "react-draggable";
 import { UndoRedoElement, useUndoRedo } from "@/context/undoRedo";
 import { drag } from "@/utils";
+import ContextMenu from "./ContextMenu";
 
-interface DEDivProps extends HTMLAttributes<HTMLDivElement> {}
+interface DEDivProps extends HTMLAttributes<HTMLDivElement> {
+  fontSize?: number
+  disabledrag?: boolean
+}
 
 const DragEditDiv: React.FC<DEDivProps> = ({
   children,
@@ -13,8 +17,11 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   const id = useId();
   const { addUndo } = useUndoRedo();
   const [undoRedoElement, setElement] = useState({} as UndoRedoElement);
-  const [disabled, setDisabled] = useState(false);
-
+  const [disabled, setDisabled] = useState(props.disabledrag || false);
+  const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
+  const [fontSize, setFontSize] = useState(props.fontSize || 16);
+  const [showMenu, setShowMenu] = useState(false);
+  
   const handleDragStart = (e: DraggableEvent) => {
     const element = divRef.current;
 
@@ -46,6 +53,19 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   const onBlur = () => {
     setDisabled(false)
   }
+
+  function handleContextMenu(e: React.MouseEvent) {
+    e.preventDefault();
+    setShowMenu(true);
+    
+    setMenuPos({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  }
+  function changeFontSize(e: React.ChangeEvent) {
+    setFontSize(+(e.target as HTMLInputElement).value)
+  }
   return (
     <>
       {divRef.current && (
@@ -57,12 +77,22 @@ const DragEditDiv: React.FC<DEDivProps> = ({
             suppressContentEditableWarning
             onFocus={onFocus}
             onBlur={onBlur}
+            style={{fontSize: `${fontSize}px`}}
+            onContextMenu={handleContextMenu} 
             {...props}
           >
             {children}
           </div>
         </Draggable>
       )}
+
+          <ContextMenu props={{...menuPos, show: showMenu, setShowMenu:setShowMenu}}>
+            <div className="text-sm flex gap-2 justify-start items-center">
+              Font size:
+              <input className="p-2 rounded-md shadow border w-24" value={fontSize} max={100} min={0} type="number" onChange={changeFontSize}/>
+            </div>
+          </ContextMenu>
+
     </>
   );
 };
