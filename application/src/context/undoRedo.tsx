@@ -34,7 +34,6 @@ export default function UndoRedoProvider({
   const [redoStack, setRedoStack] = useState([] as UndoRedoElement[]);
 
   const addUndo = (element: UndoRedoElement) => {
-    console.log("addUndo", element);
     if (element.from?.fx == element.to?.fx && arrayEquals(element.from?.args, element.to?.args))
     return;
 
@@ -42,16 +41,16 @@ export default function UndoRedoProvider({
         if( !isDuplicate(element, stk) ) stk.push(element);
         return stk;
     })
-    setRedoStack([]);
-    console.log(undoStack);
+    // setRedoStack([]);
+    console.log("addUndo", undoStack);
   };
 
   const addRedo = (element: UndoRedoElement) => {
     setRedoStack(stk => {
-        if( !isDuplicate(element, stk) ) stk.push(element);
+        stk.push(element);
         return stk;
     })
-    console.log(element);
+    console.log("addRedo ", redoStack);
   };
 
   const undo = () => {
