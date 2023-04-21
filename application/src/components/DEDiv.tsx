@@ -7,6 +7,7 @@ import ContextMenu from "./ContextMenu";
 interface DEDivProps extends HTMLAttributes<HTMLDivElement> {
   fontSize?: number
   disabledrag?: boolean
+  disableContextMenu?: boolean
 }
 
 const DragEditDiv: React.FC<DEDivProps> = ({
@@ -55,6 +56,7 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   }
 
   function handleContextMenu(e: React.MouseEvent) {
+    if (props.disableContextMenu) return;
     e.preventDefault();
     setShowMenu(true);
     

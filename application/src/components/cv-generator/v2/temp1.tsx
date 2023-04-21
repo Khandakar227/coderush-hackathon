@@ -10,7 +10,7 @@ interface Props {
 const Template1 = ({themeColor}:Props) => {
     return (
         <>
-            <div className="bg-white w-[600px] shadow border outline-none relative font-lora page resize overflow-auto" id="cv_template">
+            <div className="bg-white w-[600px] shadow border outline-none relative font-lora page resize-x overflow-auto" id="cv_template">
                 <div style={{backgroundColor: themeColor}} className="flex gap-4 justify-start items-center text-white p-4">
                     <CVImage/>
                     <div className="w-full">
