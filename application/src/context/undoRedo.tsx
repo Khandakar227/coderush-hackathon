@@ -1,5 +1,5 @@
 import { arrayEquals } from "@/utils";
-import { ReactNode, createContext, useContext, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState } from "react";
 
 type UndoRedoFunction = {
   fx: Function;
@@ -12,8 +12,10 @@ export interface UndoRedoElement {
 }
 export interface UndoRedoProps {
   undoStack: UndoRedoElement[];
+  setUndoStack:Dispatch<SetStateAction<UndoRedoElement[]>>
   redoStack: UndoRedoElement[];
-  addUndo: (element: UndoRedoElement) => void;
+  setRedoStack:Dispatch<SetStateAction<UndoRedoElement[]>>
+  addUndo: (element: UndoRedoElement, emptyRedoStack?:boolean) => void;
   addRedo: (element: UndoRedoElement) => void;
   undo: () => void;
   redo: () => void;
@@ -33,7 +35,7 @@ export default function UndoRedoProvider({
   const [undoStack, setUndoStack] = useState([] as UndoRedoElement[]);
   const [redoStack, setRedoStack] = useState([] as UndoRedoElement[]);
 
-  const addUndo = (element: UndoRedoElement) => {
+  const addUndo = (element: UndoRedoElement, emptyRedoStack = false) => {
     if (element.from?.fx == element.to?.fx && arrayEquals(element.from?.args, element.to?.args))
     return;
 
@@ -41,7 +43,7 @@ export default function UndoRedoProvider({
         if( !isDuplicate(element, stk) ) stk.push(element);
         return stk;
     })
-    // setRedoStack([]);
+    if (emptyRedoStack) setRedoStack([]);
     console.log("addUndo", undoStack);
   };
 
@@ -90,7 +92,9 @@ export default function UndoRedoProvider({
     <undoRedoContext.Provider
       value={{
         undoStack,
+        setUndoStack,
         redoStack,
+        setRedoStack,
         undo,
         redo,
         addUndo,

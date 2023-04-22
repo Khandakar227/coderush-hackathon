@@ -2,14 +2,14 @@ import React, { ChangeEvent, ImgHTMLAttributes, useEffect, useRef, useState } fr
 import ContextMenu from "../ContextMenu";
 import { UndoRedoElement, useUndoRedo } from "@/context/undoRedo";
 
-function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
+function CVImage(props: ImgHTMLAttributes<HTMLImageElement>) {
   const photoUploadRef = useRef({} as HTMLInputElement);
   const DisplayPhotRef = useRef({} as HTMLImageElement);
 
   const [displayPhoto, setDisplayPhoto] = useState("");
   const [borderRadius, setBR] = useState(0);
   const [aspectRatio, setAspectRatio] = useState("1");
-  const [width, setWidth] = useState(140);
+  const [width, setWidth] = useState(props.width || 140);
 
   const [showMenu, setShowMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
@@ -21,7 +21,7 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
   function handleContextMenu(e: React.MouseEvent) {
     e.preventDefault();
     setShowMenu(true);
-    
+
     const el = (e.target as HTMLImageElement);
 
     setMenuPos({
@@ -52,7 +52,7 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
         fx: setBR,
         args: [DisplayPhotRef.current.style.borderRadius.split("%")[0]],
       }
-    });
+    }, true);
   }
   /**
    * Undo redo feature
@@ -66,7 +66,7 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
       },
     })
   }
-  
+
   /**
    * Need to add undo redo feature
    */
@@ -80,7 +80,7 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
     })
 
     setAspectRatio(ratio);
-    
+
     setElement({
       from: undoRedoElement.from,
       to: {
@@ -90,7 +90,7 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
     })
 
     // Send the undoRedo Element to stack
-    addUndo(undoRedoElement);
+    addUndo(undoRedoElement, true);
   }
 
   /**
@@ -115,8 +115,30 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
     photoUploadRef.current.click();
   };
 
-  const changeWidth = (e:ChangeEvent) => {
+  const changeWidth = (e: ChangeEvent) => {
     setWidth(+(e.target as HTMLInputElement).value);
+    setElement({
+      ...undoRedoElement,
+      from: {
+        fx: setWidth,
+        args: [width],
+      },
+      to: {
+        fx: setWidth,
+        args: [+(e.target as HTMLInputElement).value]
+      }
+    });
+    addUndo({
+      ...undoRedoElement,
+      from: {
+        fx: setWidth,
+        args: [width],
+      },
+      to: {
+        fx: setWidth,
+        args: [+(e.target as HTMLInputElement).value]
+      }
+    }, true)
   }
   return (
     <div className="relative">
@@ -125,66 +147,67 @@ function CVImage(props:ImgHTMLAttributes<HTMLImageElement>) {
         ref={DisplayPhotRef}
         style={{ borderRadius: `${borderRadius}%`, aspectRatio: aspectRatio, width: `${width}px` }}
         className={props?.className}
+        data-name='imagediv'
         {...props}
         src={displayPhoto || "/assets/dp_temp.png"}
         onClick={onImageClick}
         onContextMenu={handleContextMenu}
       />
-        <ContextMenu props={{...menuPos, show: showMenu, setShowMenu: setShowMenu}}>
-          <button
-            className="text-sm w-full text-start py-1 hover:bg-gray-300"
-            onClick={onImageClick}
-          >
-            Change photo
-          </button>
-          <hr />
-          <div className="text-xs w-full text-gray-800">Set border radius</div>
-          <input
+      <ContextMenu props={{ ...menuPos, show: showMenu, setShowMenu: setShowMenu }}>
+        <button
+          className="text-sm w-full text-start py-1 hover:bg-gray-300"
+          onClick={onImageClick}
+        >
+          Change photo
+        </button>
+        <hr />
+        <div className="text-xs w-full text-gray-800">Set border radius</div>
+        <input
           className="hover:bg-gray-300"
-            type="range"
-            max={100}
-            min={0}
-            value={borderRadius}
-            onChange={handleBRChange}
-            onMouseDown={handSliderClick}
-            onMouseUp={handleSliderUnclick}
-          />
-          <div className="text-sm flex gap-2 justify-start items-center">
-              Width:
-              <input className="p-2 rounded-md shadow border w-24" value={width} min={0} type="number" onChange={changeWidth}/>
-            </div>
-          <hr />
-          <div className="text-xs w-full text-start py-1 text-gray-800">
-            Change aspect ratio
-          </div>
-          <div className="flex gap-1 items-start justify-between">
+          type="range"
+          max={100}
+          min={0}
+          value={borderRadius}
+          onChange={handleBRChange}
+          onMouseDown={handSliderClick}
+          onMouseUp={handleSliderUnclick}
+        />
+        <div className="text-sm flex gap-2 justify-start items-center">
+          Width:
+          <input className="p-2 rounded-md shadow border w-24" value={width} min={0} type="number" onChange={changeWidth} />
+        </div>
+        <hr />
+        <div className="text-xs w-full text-start py-1 text-gray-800">
+          Change aspect ratio
+        </div>
+        <div className="flex gap-1 items-start justify-between">
           <button
-              className="text-sm py-1 px-2 hover:bg-gray-300"
-              onClick={() => changeAspectRatio("auto")}
-            >
-              auto
-            </button>
-            <button
-              className="text-sm py-1 px-2 hover:bg-gray-300"
-              onClick={() => changeAspectRatio("3/2")}
-            >
-              3:2
-            </button>
-            <button
-              className="text-sm py-1 px-2 hover:bg-gray-300"
-              onClick={() => changeAspectRatio("16/9")}
-            >
-              16:9
-            </button>
-            <button
-              className="text-sm py-1 px-2 hover:bg-gray-300"
-              onClick={() => changeAspectRatio("1/1")}
-            >
-              1:1
-            </button>
-          </div>
-          <hr />
-        </ContextMenu>
+            className="text-sm py-1 px-2 hover:bg-gray-300"
+            onClick={() => changeAspectRatio("auto")}
+          >
+            auto
+          </button>
+          <button
+            className="text-sm py-1 px-2 hover:bg-gray-300"
+            onClick={() => changeAspectRatio("3/2")}
+          >
+            3:2
+          </button>
+          <button
+            className="text-sm py-1 px-2 hover:bg-gray-300"
+            onClick={() => changeAspectRatio("16/9")}
+          >
+            16:9
+          </button>
+          <button
+            className="text-sm py-1 px-2 hover:bg-gray-300"
+            onClick={() => changeAspectRatio("1/1")}
+          >
+            1:1
+          </button>
+        </div>
+        <hr />
+      </ContextMenu>
       <input
         type="file"
         accept="image/*"

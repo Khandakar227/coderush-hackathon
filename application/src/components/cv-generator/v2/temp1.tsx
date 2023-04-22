@@ -1,6 +1,5 @@
 import React from "react";
 import DragEditDiv from "@/components/DEDiv";
-import EditDiv from "@/components/EditDiv";
 import CVImage from "../CVImage";
 
 interface Props {
@@ -55,9 +54,9 @@ const Template1 = ({themeColor}:Props) => {
                     </div>
 
                     <div className="col-span-2 text-sm pr-2">
-                        <DragEditDiv className="shadow bg-gray-200 pl-1 my-2">
-                            <DragEditDiv disabledrag={true} fontSize={20} className="font-semibold pt-2 mb-2 pb-1"> Skills </DragEditDiv>
-                            <DragEditDiv disabledrag={true} className="whitespace-pre-wrap pb-2">
+                        <DragEditDiv disableContextMenu className="shadow bg-gray-200 pl-1 my-2">
+                            <DragEditDiv disabledrag={true} isUnderTransform={true} fontSize={20} className="font-semibold pt-2 mb-2 pb-1"> Skills </DragEditDiv>
+                            <DragEditDiv disabledrag={true} isUnderTransform={true} className="whitespace-pre-wrap pb-2">
                                 1. React js{'\n'}
                                 2. Node js{'\n'}
                                 3. Express js{'\n'}
@@ -65,16 +64,17 @@ const Template1 = ({themeColor}:Props) => {
                                 5. Python
                             </DragEditDiv>
                         </DragEditDiv>
-                        <DragEditDiv className="shadow bg-gray-200 pt-2 pl-1 pb-1 my-2">
-                            <DragEditDiv disabledrag={true} fontSize={20} className="font-semibold pt-2 mb-2 pb-1"> Work Experience </DragEditDiv>
-                            <DragEditDiv disabledrag={true} className="whitespace-pre-wrap pb-2">
+
+                        <DragEditDiv disableContextMenu className="relative shadow bg-gray-200 pt-2 pl-1 pb-1 my-2">
+                            <DragEditDiv disabledrag={true} isUnderTransform={true} fontSize={20} className="font-semibold pt-2 mb-2 pb-1"> Work Experience </DragEditDiv>
+                            <DragEditDiv disabledrag={true} isUnderTransform={true} className="whitespace-pre-wrap pb-2">
                                 Lorem ipsum, dolor sit amet consectetur adipisicing elit. Mollitia commodi tempore nostrum et eum impedit iure, ducimus facere unde numquam quas nesciunt natus quia, quisquam quasi est! In, fuga quam?
                             </DragEditDiv>
                         </DragEditDiv>
 
-                        <DragEditDiv className="shadow bg-gray-200 pt-2 pl-1 pb-1 my-2">
-                            <DragEditDiv disabledrag={true} fontSize={20} className="font-semibold pt-2 mb-2 pb-1"> Education </DragEditDiv>
-                            <DragEditDiv disabledrag={true} className="whitespace-pre-wrap pb-2">
+                        <DragEditDiv disableContextMenu className="shadow bg-gray-200 pt-2 pl-1 pb-1 my-2">
+                            <DragEditDiv disabledrag={true} isUnderTransform={true} fontSize={20} className="font-semibold pt-2 mb-2 pb-1"> Education </DragEditDiv>
+                            <DragEditDiv disabledrag={true} isUnderTransform={true} className="whitespace-pre-wrap pb-2">
                                 Lorem ipsum, dolor sit amet consectetur adipisicing elit. Mollitia commodi tempore nostrum et eum impedit iure, ducimus facere unde numquam quas nesciunt natus quia, quisquam quasi est! In, fuga quam?
                             </DragEditDiv>
                         </DragEditDiv>

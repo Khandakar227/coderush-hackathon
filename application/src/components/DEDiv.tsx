@@ -8,6 +8,7 @@ interface DEDivProps extends HTMLAttributes<HTMLDivElement> {
   fontSize?: number
   disabledrag?: boolean
   disableContextMenu?: boolean
+  isUnderTransform?:boolean
 }
 
 const DragEditDiv: React.FC<DEDivProps> = ({
@@ -23,6 +24,7 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   const [fontSize, setFontSize] = useState(props.fontSize || 16);
   const [showMenu, setShowMenu] = useState(false);
   
+
   const handleDragStart = (e: DraggableEvent) => {
     const element = divRef.current;
 
@@ -46,7 +48,7 @@ const DragEditDiv: React.FC<DEDivProps> = ({
     addUndo({
       ...undoRedoElement,
       to: {fx: drag, args: [element.id, element.style.transform]}
-    })
+    }, true)
   };
   const onFocus = () => {
     setDisabled(true)
@@ -57,6 +59,7 @@ const DragEditDiv: React.FC<DEDivProps> = ({
 
   function handleContextMenu(e: React.MouseEvent) {
     if (props.disableContextMenu) return;
+    console.log("contextmenu")
     e.preventDefault();
     setShowMenu(true);
     
@@ -67,6 +70,29 @@ const DragEditDiv: React.FC<DEDivProps> = ({
   }
   function changeFontSize(e: React.ChangeEvent) {
     setFontSize(+(e.target as HTMLInputElement).value)
+    // const element = divRef.current;
+    setElement({
+      ...undoRedoElement,
+      from: {
+        fx: setFontSize,
+        args: [fontSize],
+      },
+      to: {
+        fx: setFontSize,
+        args: [+(e.target as HTMLInputElement).value]
+      }
+    });
+    addUndo({
+      ...undoRedoElement,
+      from: {
+        fx: setFontSize,
+        args: [fontSize],
+      },
+      to: {
+        fx: setFontSize,
+        args: [+(e.target as HTMLInputElement).value]
+      }
+    }, true);
   }
   return (
     <>
@@ -80,15 +106,16 @@ const DragEditDiv: React.FC<DEDivProps> = ({
             onFocus={onFocus}
             onBlur={onBlur}
             style={{fontSize: `${fontSize}px`}}
-            onContextMenu={handleContextMenu} 
-            {...props}
+            onContextMenu={handleContextMenu}
+            data-name='drageditdiv'
+            {...props }
           >
             {children}
           </div>
         </Draggable>
       )}
 
-          <ContextMenu props={{...menuPos, show: showMenu, setShowMenu:setShowMenu}}>
+          <ContextMenu props={{...menuPos, show: showMenu, setShowMenu:setShowMenu, underTransform: props.isUnderTransform}}>
             <div className="text-sm flex gap-2 justify-start items-center">
               Font size:
               <input className="p-2 rounded-md shadow border w-24" value={fontSize} max={100} min={0} type="number" onChange={changeFontSize}/>

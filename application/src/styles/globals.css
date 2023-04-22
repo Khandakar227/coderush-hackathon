@@ -93,3 +93,9 @@
   .page * {
     white-space: pre-warp;
   }
+  [data-name='drageditdiv']:hover {
+    border: 1px solid red;
+  }
+  [data-name='imagediv']:hover {
+    border: 1px solid red;
+  }

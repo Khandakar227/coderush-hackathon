@@ -5,19 +5,23 @@ import React, { ChangeEvent, useState } from "react";
 import ColorPicker from "@/components/ColorPicker";
 import Template1 from "@/components/cv-generator/v2/temp1";
 import Template2 from "@/components/cv-generator/v2/temp2";
+import Template3 from "@/components/cv-generator/v2/temp3";
 
 const templates = [
-    {template:Template1, label: "General"},
-    {template: Template2, label: "Professional"}
+    {label: "General"},
+    {label: "Professional"},
+    {label: "Elegant"},
 ];
 
 const V2 = () => {
     const [theme, setTheme] = useState("#4338ca");
-    const [templateNumber, setTemplate] = useState(0);
-    const { undo, redo } = useUndoRedo();
+    const [templateNumber, setTemplate] = useState(2);
+    const { undo, redo, setRedoStack, setUndoStack } = useUndoRedo();
 
     const changeTemplate = (e: ChangeEvent) => {
         setTemplate(+(e.target as HTMLSelectElement).value)
+        setUndoStack([]);
+        setRedoStack([]);
     }
 
     // Convert CV to PDF
@@ -44,7 +48,7 @@ const V2 = () => {
             width: cv.clientWidth,
             autoPaging: "text",
             fontFaces: [...loraFonts],
-            margin: [0, 0, 0, 0]
+            margin: [0, 0, 0, 0],
         })
         .then(() => {
             report.save("cvrush.pdf");
@@ -66,7 +70,13 @@ const V2 = () => {
                 <button className="px-2 py-1 rounded-md text-white bg-slate-900 text-sm" onClick={generatePDF}> Export </button>
             </div>
             <div className="min-custom-h h-full w-full grid justify-center items-stretch p-4">
-                {templates[templateNumber].template({themeColor:theme})}
+                {
+                    templateNumber == 1 ?
+                    <Template2 themeColor={theme} /> :
+                    templateNumber == 2 ?
+                    <Template3 themeColor={theme} /> :
+                    <Template1 themeColor={theme} />
+                }
             </div>
         </>
     );
